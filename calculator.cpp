@@ -1,12 +1,6 @@
 #include "calculator.h"
 #include "ui_calculator.h"
 
-double calcVal = 0.0;
-bool divTrigger = false;
-bool multTrigger = false;
-bool addTrigger = false;
-bool subTrigger = false;
-
 Calculator::Calculator(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::Calculator){
         ui->setupUi(this);
@@ -29,7 +23,11 @@ Calculator::Calculator(QWidget *parent)
         connect(ui->ChangeSign, SIGNAL(released()), this, SLOT(ChangeNumberSignPressed()));
 
         connect(ui->Clear, SIGNAL(released()), this, SLOT(ClearPressed()));
-    }
+
+        connect(ui->MemClear, SIGNAL(released()), this, SLOT(MemClearPressed()));
+        connect(ui->MemAdd, SIGNAL(released()), this, SLOT(MemAddPressed()));
+        connect(ui->MemGet, SIGNAL(released()), this, SLOT(MemGetPressed()));
+}
 
 Calculator::~Calculator(){
     delete ui;
@@ -64,7 +62,7 @@ void Calculator::MathButtonPressed(){
     } else if(QString::compare(butVal, "*", Qt::CaseInsensitive) == 0){
         multTrigger = true;
     } else if(QString::compare(butVal, "+", Qt::CaseInsensitive) == 0){
-        multTrigger = false;
+        addTrigger = true;
     } else {
         subTrigger = true;
     }
@@ -92,8 +90,7 @@ void Calculator::EqualButtonPressed(){
 
 void Calculator::ChangeNumberSignPressed(){
     QString displayVal = ui->Display->text();
-    QRegularExpression re("[-]?[0-9.]*");
-    if(re.match(displayVal).hasMatch()){
+    if(QRegularExpression("[-]?[0-9.]*").match(displayVal).hasMatch()){
         double dblDisplayVal = displayVal.toDouble();
         double dblDisplayValSign = -1 * dblDisplayVal;
         ui->Display->setText(QString::number(dblDisplayValSign));
@@ -104,3 +101,9 @@ void Calculator::ClearPressed(){
     calcVal = 0.0;
     ui->Display->setText(QString::number(calcVal));
 }
+
+void Calculator::MemAddPressed(){}
+
+void Calculator::MemClearPressed(){}
+
+void Calculator::MemGetPressed(){}
