@@ -52,36 +52,45 @@ void Calculator::MathButtonPressed(){
     addTrigger = false;
     subTrigger = false;
 
-    QString displayVal = ui->Display->text();
-    calcVal = displayVal.toDouble();
+    calcVal = ui->Display->displayText().toDouble();
+
     QPushButton *button = (QPushButton *)sender();
     QString butVal = button->text();
 
+    QString operation;
+
     if(QString::compare(butVal, "/", Qt::CaseInsensitive) == 0){
         divTrigger = true;
+        operation = "/";
     } else if(QString::compare(butVal, "*", Qt::CaseInsensitive) == 0){
         multTrigger = true;
+        operation = "*";
     } else if(QString::compare(butVal, "+", Qt::CaseInsensitive) == 0){
         addTrigger = true;
+        operation = "+";
     } else {
         subTrigger = true;
+        operation = "-";
     }
 
-    ui->Display->setText("");
+    ui->Display->setText(operation);
 }
 
 void Calculator::EqualButtonPressed(){
     double solution = 0.0;
-    QString displayVal = ui->Display->text();
-    double dblDisplayVal = displayVal.toDouble();
+    double dblDisplayVal = ui->Display->text().toDouble();
     if(addTrigger || multTrigger || divTrigger || subTrigger){
         if(addTrigger){
+            addTrigger = false;
             solution = calcVal + dblDisplayVal;
         } else if(multTrigger){
+            multTrigger = false;
             solution = calcVal * dblDisplayVal;
         } else if(divTrigger){
+            divTrigger = false;
             solution = calcVal / dblDisplayVal;
         } else {
+            subTrigger = false;
             solution = calcVal - dblDisplayVal;
         }
     }
@@ -102,8 +111,8 @@ void Calculator::ClearPressed(){
     ui->Display->setText(QString::number(calcVal));
 }
 
-void Calculator::MemAddPressed(){}
+void Calculator::MemAddPressed(){ mem = ui->Display->text().toDouble(); }
 
-void Calculator::MemClearPressed(){}
+void Calculator::MemClearPressed(){ mem = 0.0; }
 
-void Calculator::MemGetPressed(){}
+void Calculator::MemGetPressed(){ ui->Display->setText(QString::number(mem)); }
