@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QRegularExpression>
+#include <QKeyEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Calculator; }
@@ -18,21 +19,17 @@ public:
 private:
     Ui::Calculator *ui;
 
-    double calcVal = 0.0;
-    double mem = 0.0;
-    bool divTrigger = false;
-    bool multTrigger = false;
-    bool addTrigger = false;
-    bool subTrigger = false;
-
 private slots:
-    void NumPressed();
-    void MathButtonPressed();
+    void NumPressedUi();
+    void MathButtonPressedUi();
     void EqualButtonPressed();
     void ChangeNumberSignPressed();
     void ClearPressed();
     void MemAddPressed();
     void MemClearPressed();
     void MemGetPressed();
+
+protected:
+    void keyPressEvent(QKeyEvent *event);
 };
 #endif // CALCULATOR_H

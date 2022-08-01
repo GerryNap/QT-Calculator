@@ -1,6 +1,14 @@
 #include "calculator.h"
 #include "ui_calculator.h"
 
+bool divTrigger = false;
+bool multTrigger = false;
+bool addTrigger = false;
+bool subTrigger = false;
+
+double calcVal = 0.0;
+double mem = 0.0;
+
 Calculator::Calculator(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::Calculator){
         ui->setupUi(this);
@@ -10,13 +18,13 @@ Calculator::Calculator(QWidget *parent)
         for(int i = 0; i < 10; ++i){
             QString butName = "Button" + QString::number(i);
             numButtons[i] = Calculator::findChild<QPushButton *>(butName);
-            connect(numButtons[i], SIGNAL(released()), this, SLOT(NumPressed()));
+            connect(numButtons[i], SIGNAL(released()), this, SLOT(NumPressedUi()));
         }
 
-        connect(ui->Add, SIGNAL(released()), this, SLOT(MathButtonPressed()));
-        connect(ui->Multiply, SIGNAL(released()), this, SLOT(MathButtonPressed()));
-        connect(ui->Subtract, SIGNAL(released()), this, SLOT(MathButtonPressed()));
-        connect(ui->Divide, SIGNAL(released()), this, SLOT(MathButtonPressed()));
+        connect(ui->Add, SIGNAL(released()), this, SLOT(MathButtonPressedUi()));
+        connect(ui->Multiply, SIGNAL(released()), this, SLOT(MathButtonPressedUi()));
+        connect(ui->Subtract, SIGNAL(released()), this, SLOT(MathButtonPressedUi()));
+        connect(ui->Divide, SIGNAL(released()), this, SLOT(MathButtonPressedUi()));
 
         connect(ui->Equals, SIGNAL(released()), this, SLOT(EqualButtonPressed()));
 
@@ -33,20 +41,18 @@ Calculator::~Calculator(){
     delete ui;
 }
 
-void Calculator::NumPressed(){
-    QPushButton *button = (QPushButton *)sender();
-    QString butVal = button->text();
+void NumPressed(QString val, Ui::Calculator *ui){
     QString displayVal = ui->Display->text();
     if((displayVal.toDouble() == 0) || (displayVal.toDouble() == 0.0)){
-        ui->Display->setText(butVal);
+        ui->Display->setText(val);
     } else {
-        QString newVal = displayVal + butVal;
+        QString newVal = displayVal + val;
         double dblNewVal = newVal.toDouble();
         ui->Display->setText(QString::number(dblNewVal, 'g', 16));
     }
 }
 
-void Calculator::MathButtonPressed(){
+void MathButtonPressed(QString operation, Ui::Calculator *ui){
     divTrigger = false;
     multTrigger = false;
     addTrigger = false;
@@ -54,26 +60,30 @@ void Calculator::MathButtonPressed(){
 
     calcVal = ui->Display->displayText().toDouble();
 
-    QPushButton *button = (QPushButton *)sender();
-    QString butVal = button->text();
-
-    QString operation;
-
-    if(QString::compare(butVal, "/", Qt::CaseInsensitive) == 0){
-        divTrigger = true;
-        operation = "/";
-    } else if(QString::compare(butVal, "*", Qt::CaseInsensitive) == 0){
+    if(QString::compare(operation, "/", Qt::CaseInsensitive) == 0){
+        divTrigger = true;;
+    } else if(QString::compare(operation, "*", Qt::CaseInsensitive) == 0){
         multTrigger = true;
-        operation = "*";
-    } else if(QString::compare(butVal, "+", Qt::CaseInsensitive) == 0){
+    } else if(QString::compare(operation, "+", Qt::CaseInsensitive) == 0){
         addTrigger = true;
-        operation = "+";
     } else {
         subTrigger = true;
-        operation = "-";
     }
 
     ui->Display->setText(operation);
+}
+
+// UI Controls
+
+void Calculator::NumPressedUi(){
+    QPushButton *button = (QPushButton *)sender();
+    QString butVal = button->text();
+    NumPressed(butVal, ui);
+}
+
+void Calculator::MathButtonPressedUi(){
+    QPushButton *button = (QPushButton *)sender();
+    MathButtonPressed(button->text(), ui);
 }
 
 void Calculator::EqualButtonPressed(){
@@ -116,3 +126,20 @@ void Calculator::MemAddPressed(){ mem = ui->Display->text().toDouble(); }
 void Calculator::MemClearPressed(){ mem = 0.0; }
 
 void Calculator::MemGetPressed(){ ui->Display->setText(QString::number(mem)); }
+
+// KeyBoard controls
+
+void Calculator::keyPressEvent(QKeyEvent *event){
+    switch(event->key()){
+        case Qt::Key_0:case Qt::Key_1:case Qt::Key_2:case Qt::Key_3:case Qt::Key_4:
+        case Qt::Key_5:case Qt::Key_6:case Qt::Key_7:case Qt::Key_8:case Qt::Key_9:
+            NumPressed(QString(char(event->key())), ui);
+        break;
+        case Qt::Key_Equal:case Qt::Key_Enter:case Qt::Key_Return:
+            EqualButtonPressed();
+        break;
+        case Qt::Key_Plus:case Qt::Key_Minus:case Qt::Key_Slash:case Qt::Key_Asterisk:
+            MathButtonPressed(QString(char(event->key())), ui);
+        break;
+    }
+}
