@@ -474,7 +474,21 @@ QPushButton:pressed{
      </widget>
     </item>
     <item row="5" column="0">
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="Point">
+      <property name="styleSheet">
+       <string notr="true">QPushButton{
+	background-color: #C0C0C0;
+	border: 1px solid black;
+	padding: 5px;
+}
+
+QPushButton:pressed{
+	background-color: #A9A9A9;
+	border: 1px solid black;
+	padding: 5px;
+}
+	</string>
+      </property>
       <property name="text">
        <string>.</string>
       </property>
@@ -508,7 +522,7 @@ QPushButton:pressed{
      </widget>
     </item>
     <item row="1" column="0">
-     <widget class="QPushButton" name="pushButton_2">
+     <widget class="QPushButton" name="Delete">
       <property name="styleSheet">
        <string notr="true">QPushButton{
 	background-color: #FF8C00;
@@ -609,35 +623,8 @@ QPushButton:pressed{
       </property>
      </widget>
     </item>
-    <item row="4" column="4" rowspan="2">
-     <widget class="QPushButton" name="Equals">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton{
-	background-color: #FF8C00;
-	border: 1px solid black;
-	padding: 5px;
-}
-
-QPushButton:pressed{
-	background-color: #A9A9A9;
-	border: 1px solid black;
-	padding: 5px;
-}
-	</string>
-      </property>
-      <property name="text">
-       <string>=</string>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="4">
-     <widget class="QPushButton" name="pushButton_3">
+     <widget class="QPushButton" name="SquareRoot">
       <property name="styleSheet">
        <string notr="true">QPushButton{
 	background-color: #FF8C00;
@@ -658,7 +645,7 @@ QPushButton:pressed{
      </widget>
     </item>
     <item row="3" column="4">
-     <widget class="QPushButton" name="pushButton_4">
+     <widget class="QPushButton" name="Percent">
       <property name="styleSheet">
        <string notr="true">QPushButton{
 	background-color: #FF8C00;
@@ -675,6 +662,54 @@ QPushButton:pressed{
       </property>
       <property name="text">
        <string>%</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="4">
+     <widget class="QPushButton" name="Equals">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton{
+	background-color:  #1f618d ;
+	border: 1px solid black;
+	padding: 5px;
+}
+
+QPushButton:pressed{
+	background-color: #154360;
+	border: 1px solid black;
+	padding: 5px;
+}
+	</string>
+      </property>
+      <property name="text">
+       <string>=</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="4">
+     <widget class="QPushButton" name="pushButton">
+      <property name="styleSheet">
+       <string notr="true">QPushButton{
+	background-color: #FF8C00;
+	border: 1px solid black;
+	padding: 5px;
+}
+
+QPushButton:pressed{
+	background-color: #A9A9A9;
+	border: 1px solid black;
+	padding: 5px;
+}
+	</string>
+      </property>
+      <property name="text">
+       <string>mod</string>
       </property>
      </widget>
     </item>

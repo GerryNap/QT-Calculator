@@ -28,6 +28,11 @@ private slots:
     void MemAddPressed();
     void MemClearPressed();
     void MemGetPressed();
+    void DeletePressed();
+    void PointPressed();
+    void SquareRootPressed();
+    void ModPressed();
+    void PercentPressed();
 
 protected:
     void keyPressEvent(QKeyEvent *event);
