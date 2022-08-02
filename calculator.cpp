@@ -1,13 +1,12 @@
 #include "calculator.h"
 #include "ui_calculator.h"
-
-bool divTrigger = false;
-bool multTrigger = false;
-bool addTrigger = false;
-bool subTrigger = false;
+#include <iostream>
 
 double calcVal = 0.0;
 double mem = 0.0;
+
+enum class Operation: char{ none, add, sub, mult, div, squareRoot, percent, mod };
+Operation currentOperation = Operation::none;
 
 Calculator::Calculator(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::Calculator){
@@ -21,20 +20,26 @@ Calculator::Calculator(QWidget *parent)
             connect(numButtons[i], SIGNAL(released()), this, SLOT(NumPressedUi()));
         }
 
-        connect(ui->Add, SIGNAL(released()), this, SLOT(MathButtonPressedUi()));
-        connect(ui->Multiply, SIGNAL(released()), this, SLOT(MathButtonPressedUi()));
-        connect(ui->Subtract, SIGNAL(released()), this, SLOT(MathButtonPressedUi()));
-        connect(ui->Divide, SIGNAL(released()), this, SLOT(MathButtonPressedUi()));
-
         connect(ui->Equals, SIGNAL(released()), this, SLOT(EqualButtonPressed()));
-
         connect(ui->ChangeSign, SIGNAL(released()), this, SLOT(ChangeNumberSignPressed()));
+        connect(ui->Dot, SIGNAL(released()), this, SLOT(DotPressed()));
 
         connect(ui->Clear, SIGNAL(released()), this, SLOT(ClearPressed()));
+        connect(ui->Delete, SIGNAL(released()), this, SLOT(DeletePressed()));
 
+        // Connect Memory
         connect(ui->MemClear, SIGNAL(released()), this, SLOT(MemClearPressed()));
         connect(ui->MemAdd, SIGNAL(released()), this, SLOT(MemAddPressed()));
         connect(ui->MemGet, SIGNAL(released()), this, SLOT(MemGetPressed()));
+
+        //Connect Operations
+        connect(ui->Add, SIGNAL(released()), this, SLOT(AddPressed()));
+        connect(ui->Multiply, SIGNAL(released()), this, SLOT(MultPressed()));
+        connect(ui->Subtract, SIGNAL(released()), this, SLOT(SubPressed()));
+        connect(ui->Divide, SIGNAL(released()), this, SLOT(DivPressed()));
+        connect(ui->SquareRoot, SIGNAL(released()), this, SLOT(SquareRootPressed()));
+        connect(ui->Percent, SIGNAL(released()), this, SLOT(PercentPressed()));
+        connect(ui->Mod, SIGNAL(released()), this, SLOT(ModPressed()));
 }
 
 Calculator::~Calculator(){
@@ -43,34 +48,13 @@ Calculator::~Calculator(){
 
 void NumPressed(QString val, Ui::Calculator *ui){
     QString displayVal = ui->Display->text();
-    if((displayVal.toDouble() == 0) || (displayVal.toDouble() == 0.0)){
+    if(displayVal.compare("0") == 0){
         ui->Display->setText(val);
     } else {
         QString newVal = displayVal + val;
         double dblNewVal = newVal.toDouble();
         ui->Display->setText(QString::number(dblNewVal, 'g', 16));
     }
-}
-
-void MathButtonPressed(QString operation, Ui::Calculator *ui){
-    divTrigger = false;
-    multTrigger = false;
-    addTrigger = false;
-    subTrigger = false;
-
-    calcVal = ui->Display->displayText().toDouble();
-
-    if(QString::compare(operation, "/", Qt::CaseInsensitive) == 0){
-        divTrigger = true;;
-    } else if(QString::compare(operation, "*", Qt::CaseInsensitive) == 0){
-        multTrigger = true;
-    } else if(QString::compare(operation, "+", Qt::CaseInsensitive) == 0){
-        addTrigger = true;
-    } else {
-        subTrigger = true;
-    }
-
-    ui->Display->setText(operation);
 }
 
 // UI Controls
@@ -81,30 +65,32 @@ void Calculator::NumPressedUi(){
     NumPressed(butVal, ui);
 }
 
-void Calculator::MathButtonPressedUi(){
-    QPushButton *button = (QPushButton *)sender();
-    MathButtonPressed(button->text(), ui);
-}
-
 void Calculator::EqualButtonPressed(){
-    double solution = 0.0;
-    double dblDisplayVal = ui->Display->text().toDouble();
-    if(addTrigger || multTrigger || divTrigger || subTrigger){
-        if(addTrigger){
-            addTrigger = false;
-            solution = calcVal + dblDisplayVal;
-        } else if(multTrigger){
-            multTrigger = false;
-            solution = calcVal * dblDisplayVal;
-        } else if(divTrigger){
-            divTrigger = false;
-            solution = calcVal / dblDisplayVal;
-        } else {
-            subTrigger = false;
-            solution = calcVal - dblDisplayVal;
-        }
+    double secondMember = ui->Display->text().toDouble();
+    switch(currentOperation){
+    case Operation::add:
+        calcVal += secondMember;
+        break;
+    case Operation::div:
+        calcVal /= secondMember;
+        break;
+    case Operation::mod:
+        calcVal = std::fmod(calcVal, secondMember);
+        break;
+    case Operation::mult:
+        calcVal *= secondMember;
+        break;
+    case Operation::sub:
+        calcVal -= secondMember;
+        break;
+    case Operation::percent:
+        calcVal = (secondMember / calcVal) * 100;
+        break;
+    default:
+        return;
     }
-    ui->Display->setText(QString::number(solution));
+
+    ui->Display->setText(QString::number(calcVal));
 }
 
 void Calculator::ChangeNumberSignPressed(){
@@ -117,29 +103,89 @@ void Calculator::ChangeNumberSignPressed(){
 }
 
 void Calculator::ClearPressed(){
+    currentOperation = Operation::none;
     calcVal = 0.0;
     ui->Display->setText(QString::number(calcVal));
 }
 
+void Calculator::DeletePressed(){ ui->Display->setText(QString("")); }
+
+// Set point on number
+bool existDot(QString str){
+    for(int i = 0; i < str.length(); ++i)
+        if(str.at(i) == '.')
+            return true;
+    return false;
+}
+
+void Calculator::DotPressed(){
+    QString txt = ui->Display->text();
+    if(existDot(txt))
+        return;
+    QString newVal = txt + '.';
+    ui->Display->setText(newVal);
+}
+
+// Memory
 void Calculator::MemAddPressed(){ mem = ui->Display->text().toDouble(); }
-
 void Calculator::MemClearPressed(){ mem = 0.0; }
-
 void Calculator::MemGetPressed(){ ui->Display->setText(QString::number(mem)); }
 
-// KeyBoard controls
+// Operations
+void setCurrentOperation(Operation operation, Ui::Calculator *ui){
+    calcVal = ui->Display->displayText().toDouble();
+    currentOperation = operation;
+    ui->Display->setText("");
+}
 
+void Calculator::AddPressed(){ setCurrentOperation(Operation::add, ui); }
+void Calculator::SubPressed(){ setCurrentOperation(Operation::sub, ui); }
+void Calculator::MultPressed(){ setCurrentOperation(Operation::mult, ui); }
+void Calculator::DivPressed(){ setCurrentOperation(Operation::div, ui); }
+void Calculator::PercentPressed(){ setCurrentOperation(Operation::percent, ui); }
+void Calculator::ModPressed(){ setCurrentOperation(Operation::mod, ui); }
+void Calculator::SquareRootPressed(){
+    calcVal = std::sqrt(ui->Display->text().toDouble());
+    ui->Display->setText(QString::number(calcVal));
+    currentOperation = Operation::none;
+}
+
+// KeyBoard controls
 void Calculator::keyPressEvent(QKeyEvent *event){
+    // Check if is pressed a number
+    if(Qt::Key_0 <= event->key() && event->key() <= Qt::Key_9){
+        NumPressed(QString(char(event->key())), ui);
+        return;
+    }
+
+    //Check if an operation is pressed
     switch(event->key()){
-        case Qt::Key_0:case Qt::Key_1:case Qt::Key_2:case Qt::Key_3:case Qt::Key_4:
-        case Qt::Key_5:case Qt::Key_6:case Qt::Key_7:case Qt::Key_8:case Qt::Key_9:
-            NumPressed(QString(char(event->key())), ui);
+    case Qt::Key_Equal:case Qt::Key_Enter:case Qt::Key_Return:
+        EqualButtonPressed();
         break;
-        case Qt::Key_Equal:case Qt::Key_Enter:case Qt::Key_Return:
-            EqualButtonPressed();
+    case Qt::Key_Plus:
+        AddPressed();
         break;
-        case Qt::Key_Plus:case Qt::Key_Minus:case Qt::Key_Slash:case Qt::Key_Asterisk:
-            MathButtonPressed(QString(char(event->key())), ui);
+    case Qt::Key_Minus:
+        SubPressed();
+        break;
+    case Qt::Key_Slash:
+        DivPressed();
+        break;
+    case Qt::Key_Asterisk:
+        MultPressed();
+        break;
+    case Qt::Key_Percent:
+        PercentPressed();
+        break;
+    case Qt::Key_Backspace:
+        DeletePressed();
+        break;
+    case Qt::Key_Delete:
+        ClearPressed();
+        break;
+    case 46:
+        DotPressed();
         break;
     }
 }

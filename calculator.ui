@@ -474,7 +474,7 @@ QPushButton:pressed{
      </widget>
     </item>
     <item row="5" column="0">
-     <widget class="QPushButton" name="Point">
+     <widget class="QPushButton" name="Dot">
       <property name="styleSheet">
        <string notr="true">QPushButton{
 	background-color: #C0C0C0;
@@ -693,7 +693,7 @@ QPushButton:pressed{
      </widget>
     </item>
     <item row="4" column="4">
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="Mod">
       <property name="styleSheet">
        <string notr="true">QPushButton{
 	background-color: #FF8C00;

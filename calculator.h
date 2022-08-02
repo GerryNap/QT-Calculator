@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QRegularExpression>
 #include <QKeyEvent>
+#include <cmath>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Calculator; }
@@ -21,15 +22,22 @@ private:
 
 private slots:
     void NumPressedUi();
-    void MathButtonPressedUi();
     void EqualButtonPressed();
     void ChangeNumberSignPressed();
     void ClearPressed();
+    void DeletePressed();
+    void DotPressed();
+
+    // Memory
     void MemAddPressed();
     void MemClearPressed();
     void MemGetPressed();
-    void DeletePressed();
-    void PointPressed();
+
+    // Operations
+    void AddPressed();
+    void SubPressed();
+    void MultPressed();
+    void DivPressed();
     void SquareRootPressed();
     void ModPressed();
     void PercentPressed();
